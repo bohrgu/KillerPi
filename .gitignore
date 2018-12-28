@@ -87,4 +87,7 @@ typings/
 # maxOS files
 .DS_Store
 
+# SQLite3 DB files
+*.db
+
 # End of https://www.gitignore.io/api/node
