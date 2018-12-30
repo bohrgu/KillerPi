@@ -2,18 +2,22 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('sqlite:./Killer.db')
 
 
-var Game = sequelize.define('game', {
+var GameModel = sequelize.define('game', {
 	uuid: {
 		field: 'UUID',
 		type: Sequelize.STRING,
 		primaryKey: true
 	},
+	creationDate: {
+		field: 'CREATION_DATE',
+		type: Sequelize.STRING
+	},
 	name: {
 		field: 'NAME',
 		type: Sequelize.STRING
 	},
-	creationDate: {
-		field: 'CREATION_DATE',
+	ownerEmail: {
+		field: 'OWNER_EMAIL',
 		type: Sequelize.STRING
 	},
 	endDate: {
@@ -35,4 +39,4 @@ var Game = sequelize.define('game', {
 })
 
 // Export model
-module.exports = Game
+module.exports = GameModel
