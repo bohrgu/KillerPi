@@ -1,0 +1,14 @@
+extends layout
+
+block content
+	h1 Failure
+	h4 Shit happens
+	if details
+		ul
+		each detail in details
+			li=detail
+
+	if errors 
+		ul
+		for error in errors
+			li!= error.msg

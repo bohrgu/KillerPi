@@ -58,13 +58,13 @@ echo "INSERT INTO CHALLENGE VALUES ('28e45d12-84b9-4245-adb1-5e16ed2799c4', 'rac
 #echo "INSERT INTO CHALLENGE VALUES ('847d1da2-6854-42e3-9ace-01c0bab9f108', );" >> $db_file_name
 
 # table to store killer games
-# the 'code' is a security system to prevent users from joining the wrong party
-echo 'CREATE TABLE GAME(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, NAME TEXT NOT NULL, OWNER_EMAIL TEXT NOT NULL, END_DATE TEXT NOT NULL, STATUS TEXT NOT NULL, CODE TEXT NOT NULL);' >> $db_file_name
+# the 'party_code' is a system to prevent players from joining the wrong party
+echo 'CREATE TABLE GAME(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, NAME TEXT NOT NULL, OWNER_EMAIL TEXT NOT NULL, END_DATE TEXT NOT NULL, STATUS TEXT NOT NULL, PARTY_CODE TEXT NOT NULL, MASTER_CODE TEXT NOT NULL);' >> $db_file_name
 #GAME.STATUS: PENDING, ACTIVE, ENDED
 
-# table to store users
+# table to store players
 # the 'code' is a security system to verify an attempt to fulfill a contract
-echo 'CREATE TABLE USER(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, GAME_UUID TEXT NOT NULL, FIRST_NAME TEXT NOT NULL, LAST_NAME TEXT NOT NULL, EMAIL TEXT NOT NULL, CODE TEXT NOT NULL);' >> $db_file_name
+echo 'CREATE TABLE PLAYER(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, GAME_UUID TEXT NOT NULL, FIRST_NAME TEXT NOT NULL, LAST_NAME TEXT NOT NULL, EMAIL TEXT NOT NULL, CODE TEXT NOT NULL);' >> $db_file_name
 
 # table to link players by contracts in the current game
 # french contract example: "Bonjour {killer}, tu vas devoir tuer {victim} en le/la faisant {challenge}."

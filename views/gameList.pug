@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1=title
+  
+  ul
+  each game in gamesList
+    li 
+      a(href='/games/'+game.uuid) #{game.name}
+  else
+    p There are no games.

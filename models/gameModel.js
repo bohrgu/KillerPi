@@ -29,8 +29,12 @@ var GameModel = sequelize.define('game', {
 		type: Sequelize.ENUM,
 		values: ['PENDING', 'ACTIVE', 'ENDED']
 	},
-	code: {
-		field: 'CODE',
+	partyCode: {
+		field: 'PARTY_CODE',
+		type: Sequelize.STRING
+	},
+	masterCode: {
+		field: 'MASTER_CODE',
 		type: Sequelize.STRING
 	}
 }, {

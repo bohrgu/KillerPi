@@ -1,0 +1,9 @@
+extends layout
+
+block content
+	h1=title
+	h4=message
+	if details
+		ul
+		each detail in details
+			li=detail

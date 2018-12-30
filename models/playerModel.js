@@ -2,7 +2,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('sqlite:./Killer.db')
 
 
-var UserModel = sequelize.define('game', {
+var PlayerModel = sequelize.define('player', {
 	uuid: {
 		field: 'UUID',
 		type: Sequelize.STRING,
@@ -38,4 +38,4 @@ var UserModel = sequelize.define('game', {
 })
 
 // Export model
-module.exports = UserModel
+module.exports = PlayerModel

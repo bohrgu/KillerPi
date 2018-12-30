@@ -2,7 +2,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('sqlite:./Killer.db')
 
 
-var ContractModel = sequelize.define('game', {
+var ContractModel = sequelize.define('contract', {
 	uuid: {
 		field: 'UUID',
 		type: Sequelize.STRING,

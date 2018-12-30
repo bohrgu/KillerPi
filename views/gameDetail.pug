@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  h1 Game: #{game.name}
+
+  h4 Status: #{game.status}
+  
+  if game.status==='PENDING'
+    form(method='POST' action='/games/'+game.uuid+'/activate')
+      div.form-group
+        label(for='masterCode') Enter master code to activate:
+        br
+        input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
+      button.btn.btn-primary(type='submit') Activate
+
+  h4 Players
+
+  ul
+  each player in playersList
+    li=player.firstName+' '+player.lastName
+  else
+    p There are no players.
+
+  if game.status==='PENDING'
+    form(method='POST' action='/games/'+game.uuid+'/invite')
+      div.form-group
+        label(for='email') Enter email and master code to invite someone:
+        br
+        input#email.form-control(type='text', placeholder='xyz@domain.com' name='email' required='true')
+        input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
+      button.btn.btn-primary(type='submit') Invite
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg

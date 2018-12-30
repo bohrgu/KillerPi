@@ -2,7 +2,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('sqlite:./Killer.db')
 
 
-var AttemptModel = sequelize.define('game', {
+var AttemptModel = sequelize.define('attempt', {
 	uuid: {
 		field: 'UUID',
 		type: Sequelize.STRING,
