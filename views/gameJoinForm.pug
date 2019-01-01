@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  h1 Join "#{game.name}"
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='firstName') First Name:
+      br
+      input#firstName.form-control(type='text', placeholder='William' name='firstName' required='true' value=(undefined===player ? '' : player.firstName) )
+
+    div.form-group
+      label(for='lastName') Last Name:
+      br
+      input#lastName.form-control(type='text', placeholder='Tell' name='lastName' required='true' value=(undefined===player ? '' : player.lastName) )
+
+    div.form-group
+      label(for='email') Email:
+      br
+      input#email.form-control(type='text', placeholder='xyz@domain.com' name='email' required='true' value=(undefined===player ? '' : player.email) )
+     
+    div.form-group
+      label(for='partyCode') Party code:
+      br
+      input#partyCode.form-control(type='text', placeholder='0501' name='partyCode' required='true' )
+ 
+    button.btn.btn-primary(type='submit') Join
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg

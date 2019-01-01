@@ -2,22 +2,27 @@ extends layout
 
 block content
   h1 Game: #{game.name}
-
+  br
   h4 Status: #{game.status}
   
   if game.status==='PENDING'
     form(method='POST' action='/games/'+game.uuid+'/activate')
       div.form-group
-        label(for='masterCode') Enter master code to activate:
+        label(for='masterCode') Enter master code to start the party:
         br
         input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
-      button.btn.btn-primary(type='submit') Activate
+      button.btn.btn-primary(type='submit') Start the party
+  br
 
   h4 Players
 
   ul
   each player in playersList
-    li=player.firstName+' '+player.lastName
+    li
+      if game.status==='ACTIVE'
+        a(href='/attempts?gameUuid='+game.uuid+'&playerUuid='+player.uuid ) #{player.firstName} #{player.lastName}
+      else
+        p #{player.firstName} #{player.lastName}
   else
     p There are no players.
 
@@ -29,6 +34,11 @@ block content
         input#email.form-control(type='text', placeholder='xyz@domain.com' name='email' required='true')
         input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
       button.btn.btn-primary(type='submit') Invite
+
+  br
+  if game.status==='PENDING'
+    a(href='/games/'+game.uuid+'/join')
+      button.btn.btn-primary() Join
 
   if errors 
     ul

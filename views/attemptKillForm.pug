@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h1 Hi "#{player.firstName}"
+  br
+  h4 You are about to attempt a kill
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='killerCode') Your code:
+      br
+      input#killerCode.form-control(type='text', placeholder='1701' name='killerCode' required='true' )
+     
+    div.form-group
+      label(for='victimUuid') Victim:
+      select#victimUuid.form-control(type='select', name='victimUuid' required='true' )
+        for victim in victims
+            option(value=victim.uuid) #{victim.firstName} #{victim.lastName}
+      
+    div.form-group
+      label(for='victimCode') Victim code:
+      br
+      input#victimCode.form-control(type='text', placeholder='0501' name='victimCode' required='true' )
+ 
+    button.btn.btn-primary(type='submit') Kill
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg
