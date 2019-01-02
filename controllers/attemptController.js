@@ -6,7 +6,7 @@ var Attempt = require('../models/attempt')
 var contractController = require('./contractController')
 var Sequelize = require('sequelize')
 var sequelize = new Sequelize('sqlite:./Killer.db')
-const Op = Sequelize.Op;
+const Op = Sequelize.Op
 const myLog = require('../utils/myLog')
 
 const { body, validationResult } = require('express-validator/check')
