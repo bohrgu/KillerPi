@@ -60,7 +60,7 @@ echo "INSERT INTO CHALLENGE VALUES ('28e45d12-84b9-4245-adb1-5e16ed2799c4', 'rac
 # table to store killer games
 # the 'party_code' is a system to prevent players from joining the wrong party
 echo 'CREATE TABLE GAME(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, NAME TEXT NOT NULL, OWNER_EMAIL TEXT NOT NULL, END_DATE TEXT NOT NULL, STATUS TEXT NOT NULL, PARTY_CODE TEXT NOT NULL, MASTER_CODE TEXT NOT NULL);' >> $db_file_name
-#GAME.STATUS: PENDING, ACTIVE, ENDED
+#GAME.STATUS: 'PENDING', 'ACTIVE', 'ENDED'
 
 # table to store players
 # the 'code' is a security system to verify an attempt to fulfill a contract
@@ -69,11 +69,11 @@ echo 'CREATE TABLE PLAYER(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT
 # table to link players by contracts in the current game
 # french contract example: "Bonjour {killer}, tu vas devoir tuer {victim} en le/la faisant {challenge}."
 echo 'CREATE TABLE CONTRACT(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, GAME_UUID TEXT NOT NULL, KILLER_UUID TEXT NOT NULL, VICTIM_UUID TEXT NOT NULL, CHALLENGE_UUID TEXT NOT NULL, STATUS TEXT NOT NULL);' >> $db_file_name
-#CONTRACT.STATUS: ACTIVE, SUCCESS, FAILURE, ENDED
+#CONTRACT.STATUS: 'ACTIVE', 'FULFILLED', 'FAILED', 'SUICIDE', 'REVOKED', 'ENDED'
 
 # table to store attempts to fulfill a contract
 echo 'CREATE TABLE ATTEMPT(UUID TEXT PRIMARY KEY NOT NULL, CREATION_DATE TEXT NOT NULL, GAME_UUID TEXT NOT NULL, KILLER_UUID TEXT NOT NULL, VICTIM_UUID TEXT NOT NULL, STATUS TEXT NOT NULL);' >> $db_file_name
-#ATTEMPT.STATUS: SUCCESS, FAILURE
+#ATTEMPT.STATUS: 'SUCCESS', 'FAILURE'
 
 #cat $db_file_name
 sqlite3 -init $db_file_name Killer.db

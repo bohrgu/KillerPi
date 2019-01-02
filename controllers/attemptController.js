@@ -1,12 +1,12 @@
 const uuidv4 = require('uuid/v4')
-var GameModel = require('../models/gameModel')
-var PlayerModel = require('../models/playerModel')
-var ContractModel = require('../models/contractModel')
-var AttemptModel = require('../models/attemptModel')
+var Game = require('../models/game')
+var Player = require('../models/player')
+var Contract = require('../models/contract')
+var Attempt = require('../models/attempt')
+var contractController = require('./contractController')
 var Sequelize = require('sequelize')
 var sequelize = new Sequelize('sqlite:./Killer.db')
 const Op = Sequelize.Op;
-var mailer = require('../utils/mailer')
 
 const { body, validationResult } = require('express-validator/check')
 const { sanitizeBody } = require('express-validator/filter')
@@ -19,7 +19,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getGame = function(){
-        return GameModel.findOne({
+        return Game.findOne({
             where: {
                 uuid: req.query.gameUuid
             }
@@ -30,7 +30,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getContract = function(){
-        return ContractModel.findOne({
+        return Contract.findOne({
             where: {
                 gameUuid: req.query.gameUuid,
                 killerUuid: req.query.playerUuid,
@@ -43,7 +43,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getPlayer = function(){
-        return PlayerModel.findOne({
+        return Player.findOne({
             where: {
                 uuid: req.query.playerUuid
             }
@@ -54,7 +54,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getVictims = function(){
-        return PlayerModel.findAll({
+        return Player.findAll({
             where: {
                 gameUuid: req.query.gameUuid,
                 uuid: {
@@ -74,7 +74,7 @@ exports.attemptKillForm = function(req, res) {
                 message: 'This game is outdated or not active yet.'
             })
         }
-        else if (contract) {
+        else if (!contract) {
             res.render('info', { 
                 title: 'No active contract',
                 message: 'Seems like you\'re dead dude.'
@@ -116,55 +116,126 @@ exports.attemptKillPost = [
             return
         }
         else {
-            // TODO: check killer code first
-            // TODO: check contract existence and victim code
-            ContractModel.findOne({
+            Player.findOne({
                 where: {
                     gameUuid: req.query.gameUuid,
-                    killerUuid: req.query.playerUuid,
-                    victimUuid: req.body.victimUuid,
-                    status: 'ACTIVE'
+                    uuid: req.query.playerUuid,
+                    code: req.body.killerCode
                 }
             })
-            .then(contract => {
-                var status = 'FAILURE'
-                if (contract) {
-                    status = 'SUCCESS'
+            .then(player => {
+                if (!player) {
+                    // Killer entered a wrong personnal code
+                    res.render('info', { 
+                        title: 'Bad attempt',
+                        message: 'There are no visible contract with this guy or the personnal codes are wrong, be careful, the game can kill you ...'
+                    })
                 }
-                var nowISO8601 = new Date().toISOString().split('.')[0]+'Z'
-                var uuid = uuidv4()
+                else {
+                    var getContract = function(){
+                        return Contract.findOne({
+                            where: {
+                                gameUuid: req.query.gameUuid,
+                                killerUuid: req.query.playerUuid,
+                                victimUuid: req.body.victimUuid,
+                                status: 'ACTIVE'
+                            }
+                        })
+                        .catch(err => {
+                            res.render('shitHappens')
+                        })
+                    }
 
-                // Create a AttemptModel object with escaped and trimmed data.
-                AttemptModel.create({
-                    uuid: uuid,
-                    creationDate: nowISO8601,
-                    gameUuid: req.query.gameUuid,
-                    killerUuid: req.query.playerUuid,
-                    victimUuid: req.body.victimUuid,
-                    status: status
-                })
-                .then(result => {
-                    if (result.status === 'SUCCESS') {
-                        // TODO: update killer contract and copy victim contract
-                        res.render('info', { 
-                            title: 'Boom',
-                            message: 'This guy is dead, you will get a new contract soon.'
+                    var getVictim = function(){
+                        return Player.findOne({
+                            where: {
+                                gameUuid: req.query.gameUuid,
+                                uuid: req.body.victimUuid,
+                                code: req.body.victimCode
+                            }
+                        })
+                        .catch(err => {
+                            res.render('shitHappens')
                         })
                     }
-                    else {
-                        res.render('info', { 
-                            title: 'Bad attempt',
-                            message: 'There are no visible contract with this guy or the personnal codes are wrong, be careful, the game can kill you ...'
+
+                    sequelize.Promise.join(getContract(), getVictim(), function(contract, victim){
+                        var status = 'FAILURE'
+                        if (contract && victim) {
+                            status = 'SUCCESS'
+                        }
+                        var nowISO8601 = new Date().toISOString().split('.')[0]+'Z'
+                        var uuid = uuidv4()
+
+                        // Create a Attempt object with escaped and trimmed data.
+                        Attempt.create({
+                            uuid: uuid,
+                            creationDate: nowISO8601,
+                            gameUuid: req.query.gameUuid,
+                            killerUuid: req.query.playerUuid,
+                            victimUuid: req.body.victimUuid,
+                            status: status
                         })
-                    }
-                })
-                .catch(err => {
-                    res.render('shitHappens')
-                })
+                        .then(result => {
+                            if (result.status === 'SUCCESS') {
+                                contractController.fulfillContract(req.query.gameUuid, req.query.playerUuid, req.body.victimUuid, 'FAILED')
+                                res.render('info', { 
+                                    title: 'Boom',
+                                    message: 'This guy is dead, you will get a new contract soon. Check your mails.'
+                                })
+                            }
+                            else {
+                                // Count previous attempts
+                                Attempt.count({
+                                    where : {
+                                        gameUuid: req.query.gameUuid,
+                                        killerUuid: req.query.playerUuid,
+                                        status: 'FAILURE'
+                                    }
+                                })
+                                .then(result => {
+                                    console.log(result)
+                                    if (result >= 3) {
+                                        // Kill the killer by suicide for too many attempts
+                                        Contract.findOne({
+                                            where: {
+                                                gameUuid: req.query.gameUuid,
+                                                victimUuid: req.query.playerUuid,
+                                                status: 'ACTIVE'
+                                            }
+                                        })
+                                        .then(contract => {
+                                            contractController.fulfillContract(contract.gameUuid, contract.killerUuid, contract.victimUuid, 'SUICIDE')
+                                            res.render('info', { 
+                                                title: 'Suicide !',
+                                                message: 'You tried too many times, so the game killed you.'
+                                            })
+                                        })
+                                        .catch(err => {
+                                            res.render('shitHappens')
+                                        })
+                                    }
+                                    else {
+                                        res.render('info', { 
+                                            title: 'Bad attempt',
+                                            message: 'There are no visible contract with this guy or the personnal codes are wrong, be careful, the game can kill you ...'
+                                        })
+                                    }
+                                })
+                                .catch(err => {
+                                    res.render('shitHappens')
+                                })
+                            }
+                        })
+                        .catch(err => {
+                            res.render('shitHappens')
+                        })
+                    })
+                }
             })
             .catch(err => {
                 res.render('shitHappens')
             })
         }
     }
-    ]
+]

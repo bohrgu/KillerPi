@@ -2,7 +2,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('sqlite:./Killer.db')
 
 
-var ContractModel = sequelize.define('contract', {
+var Player = sequelize.define('player', {
 	uuid: {
 		field: 'UUID',
 		type: Sequelize.STRING,
@@ -16,22 +16,21 @@ var ContractModel = sequelize.define('contract', {
 		field: 'GAME_UUID',
 		type: Sequelize.STRING
 	},
-	killerUuid: {
-		field: 'KILLER_UUID',
+	firstName: {
+		field: 'FIRST_NAME',
 		type: Sequelize.STRING
 	},
-	victimUuid: {
-		field: 'VICTIM_UUID',
+	lastName: {
+		field: 'LAST_NAME',
 		type: Sequelize.STRING
 	},
-	challengeUuid: {
-		field: 'CHALLENGE_UUID',
+	email: {
+		field: 'EMAIL',
 		type: Sequelize.STRING
 	},
-	status: {
-		field: 'STATUS',
-		type: Sequelize.ENUM,
-		values: ['ACTIVE', 'SUCCESS', 'FAILURE', 'ENDED']
+	code: {
+		field: 'CODE',
+		type: Sequelize.STRING
 	}
 }, {
 	timestamps: false,
@@ -39,4 +38,4 @@ var ContractModel = sequelize.define('contract', {
 })
 
 // Export model
-module.exports = ContractModel
+module.exports = Player

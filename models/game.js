@@ -1,8 +1,8 @@
-var Sequelize = require('sequelize');
+var Sequelize = require('sequelize')
 var sequelize = new Sequelize('sqlite:./Killer.db')
 
 
-var AttemptModel = sequelize.define('attempt', {
+var Game = sequelize.define('game', {
 	uuid: {
 		field: 'UUID',
 		type: Sequelize.STRING,
@@ -12,22 +12,30 @@ var AttemptModel = sequelize.define('attempt', {
 		field: 'CREATION_DATE',
 		type: Sequelize.STRING
 	},
-	gameUuid: {
-		field: 'GAME_UUID',
+	name: {
+		field: 'NAME',
 		type: Sequelize.STRING
 	},
-	killerUuid: {
-		field: 'KILLER_UUID',
+	ownerEmail: {
+		field: 'OWNER_EMAIL',
 		type: Sequelize.STRING
 	},
-	victimUuid: {
-		field: 'VICTIM_UUID',
+	endDate: {
+		field: 'END_DATE',
 		type: Sequelize.STRING
 	},
 	status: {
 		field: 'STATUS',
 		type: Sequelize.ENUM,
-		values: ['SUCCESS', 'FAILURE']
+		values: ['PENDING', 'ACTIVE', 'ENDED']
+	},
+	partyCode: {
+		field: 'PARTY_CODE',
+		type: Sequelize.STRING
+	},
+	masterCode: {
+		field: 'MASTER_CODE',
+		type: Sequelize.STRING
 	}
 }, {
 	timestamps: false,
@@ -35,4 +43,4 @@ var AttemptModel = sequelize.define('attempt', {
 })
 
 // Export model
-module.exports = AttemptModel
+module.exports = Game

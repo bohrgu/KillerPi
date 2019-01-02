@@ -2,22 +2,31 @@ extends layout
 
 block content
   h1 Game: #{game.name}
-  br
   h4 Status: #{game.status}
   
   if game.status==='PENDING'
-    form(method='POST' action='/games/'+game.uuid+'/activate')
+    if players.length>1
+      form(method='POST' action='/games/'+game.uuid+'/activate')
+        div.form-group
+          label(for='masterCode') Enter master code to start the party:
+          br
+          input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
+        button.btn.btn-primary(type='submit') Start the party
+
+  if game.status==='ACTIVE'
+    form(method='POST' action='/games/'+game.uuid+'/deactivate')
       div.form-group
-        label(for='masterCode') Enter master code to start the party:
+        label(for='masterCode') Enter master code to deactivate the party:
+        br
+        label(for='masterCode') (It will revoke unfulfilled contracts)
         br
         input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
-      button.btn.btn-primary(type='submit') Start the party
-  br
+      button.btn.btn-primary(type='submit') Deactivate party
 
   h4 Players
 
   ul
-  each player in playersList
+  each player in players
     li
       if game.status==='ACTIVE'
         a(href='/attempts?gameUuid='+game.uuid+'&playerUuid='+player.uuid ) #{player.firstName} #{player.lastName}
@@ -27,19 +36,21 @@ block content
     p There are no players.
 
   if game.status==='PENDING'
+    a(href='/games/'+game.uuid+'/join')
+      button.btn.btn-primary() Join
+  
+  br
+  br
+  if game.status==='PENDING'
     form(method='POST' action='/games/'+game.uuid+'/invite')
       div.form-group
         label(for='email') Enter email and master code to invite someone:
         br
-        input#email.form-control(type='text', placeholder='xyz@domain.com' name='email' required='true')
-        input#masterCode.form-control(type='text', placeholder='0501' name='masterCode' required='true')
+        input#email.form-control(type='text', placeholder='guest mail: xyz@domain.com' name='email' required='true')
+        input#masterCode.form-control(type='text', placeholder='master code: 0501' name='masterCode' required='true')
       button.btn.btn-primary(type='submit') Invite
 
   br
-  if game.status==='PENDING'
-    a(href='/games/'+game.uuid+'/join')
-      button.btn.btn-primary() Join
-
   if errors 
     ul
       for error in errors

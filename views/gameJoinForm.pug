@@ -17,12 +17,12 @@ block content
     div.form-group
       label(for='email') Email:
       br
-      input#email.form-control(type='text', placeholder='xyz@domain.com' name='email' required='true' value=(undefined===player ? '' : player.email) )
+      input#email.form-control(type='text', placeholder='xyz@domain.com' name='email' required='true' value=(undefined===email ? '' : email) )
      
     div.form-group
       label(for='partyCode') Party code:
       br
-      input#partyCode.form-control(type='text', placeholder='0501' name='partyCode' required='true' )
+      input#partyCode.form-control(type='text', placeholder='0501' name='partyCode' required='true' value=(undefined===partyCode ? '' : partyCode) )
  
     button.btn.btn-primary(type='submit') Join
 

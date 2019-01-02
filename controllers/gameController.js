@@ -1,16 +1,19 @@
 const uuidv4 = require('uuid/v4')
-var GameModel = require('../models/gameModel')
-var PlayerModel = require('../models/playerModel')
+var Game = require('../models/game')
+var Player = require('../models/player')
 var Sequelize = require('sequelize')
 var sequelize = new Sequelize('sqlite:./Killer.db')
 var mailer = require('../utils/mailer')
+const base64url = require('base64url');
+var contractController = require('./contractController')
+var baseURL = require('../utils/baseURL')
 
 const { body, validationResult } = require('express-validator/check')
 const { sanitizeBody } = require('express-validator/filter')
 
 // Display a list of all Games
 exports.gameGetAll = function(req, res) {
-	GameModel.findAndCountAll({
+	Game.findAndCountAll({
 		order: [['name', 'ASC']]
 	})
 	.then(result => {
@@ -64,8 +67,8 @@ exports.gameCreationPost = [
         	var masterCode = Math.floor(Math.random() * 9000 + 1000)
         	var uuid = uuidv4()
 
-            // Create a GameModel object with escaped and trimmed data.
-            GameModel.create({
+            // Create a Game object with escaped and trimmed data.
+            Game.create({
             	uuid: uuid,
             	creationDate: nowISO8601,
             	name: req.body.name,
@@ -77,13 +80,13 @@ exports.gameCreationPost = [
             })
             .then(result => {
 		    		// Create email message
-		    		var gameURL = req.protocol + '://' + req.get('host') + '/games/'
+		    		var gameURL = baseURL.baseURL + '/games/'
 		    		var message = 'Hey,\n\nYour party "' + req.body.name + '" was created.\
 		    		\n\nTo invite players you can use the following management page:\
 		    		\n' + gameURL + uuid + '\
 		    		\nor you can send them a direct link:\
 		    		\n' + gameURL + uuid + '/join\
-		    		\nIn both cases you need to send the party code to your guests to allow them to join: ' + partyCode + '\
+		    		\nIf you send a direct link you need to send the party code to your guests to allow them to join: ' + partyCode + '\
 		    		\n\nAnd you will need your master code to manage your game (keep it secret): ' + masterCode + '\
 		    		\n\nWhen all players will have joined, you will be able to start the game from the management page:\
 		    		\n' + gameURL + uuid + '\
@@ -109,7 +112,7 @@ exports.gameCreationPost = [
 // Display detail page for a specific Game
 exports.gameGetOne = function(req, res) {
 	var getGame = function(){
-		return GameModel.findOne({
+		return Game.findOne({
 			where: {
 				uuid: req.params.uuid
 			}
@@ -120,7 +123,7 @@ exports.gameGetOne = function(req, res) {
 	}
 
 	var getPlayers = function(){
-		return PlayerModel.findAll({
+		return Player.findAll({
 			where: {
 				gameUuid: req.params.uuid
 			}
@@ -131,10 +134,10 @@ exports.gameGetOne = function(req, res) {
 	}
 
 	sequelize.Promise.join(getGame(), getPlayers(), function(game, players){
-		//TODO: deactivate game if end date is in the past
+		// TODO: deactivate game if end date is in the past
 		res.render('gameDetail', {
 			game: game,
-			playersList: players
+			players: players
 		})
 	})
 }
@@ -161,25 +164,29 @@ exports.gameActivationPost = [
             return
         }
         else {
-        	// TODO: create contracts, send emails and update game status
-        	GameModel.update({
+        	Game.update({
         		status: 'ACTIVE',
         	}, {
         		where: {
         			uuid: req.params.uuid,
-        			masterCode: req.body.masterCode
+        			masterCode: req.body.masterCode,
+        			status: 'PENDING'
         		},
         		returning: true
         	})
         	.then(result => {
         		if (result[1] == 1) {
-        			res.render('info', { 
+        			contractController.generateContracts(req.params.uuid)
+        			res.render('info', {
         				title: 'Game activated',
         				message: 'Players can now kill each other'
         			})
         		}
         		else {
-        			res.render('shitHappens')
+		    		res.render('info', { 
+		    			title: 'Failure',
+		    			message: 'Invalid parameters or game already activated.'
+		    		})
         		}
         	})
         	.catch(err => {
@@ -189,6 +196,59 @@ exports.gameActivationPost = [
     }
     ]
 
+// Handle Game deactivation on POST
+exports.gameDeactivationPost = [
+    // Validate fields.
+    body('masterCode').isLength({ min: 4, max: 4 }).trim().withMessage('Master code must be 4 characters.')
+    .isNumeric().withMessage('Master code must be numeric.'),
+    
+    // Sanitize fields.
+    sanitizeBody('masterCode').trim().escape(),
+
+	// Process request after validation and sanitization.
+	(req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req)
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/errors messages.
+            res.render('shitHappens', {
+            	errors: errors.array() 
+            })
+            return
+        }
+        else {
+        	Game.update({
+        		status: 'PENDING',
+        	}, {
+        		where: {
+        			uuid: req.params.uuid,
+        			masterCode: req.body.masterCode,
+        			status: 'ACTIVE'
+        		},
+        		returning: true
+        	})
+        	.then(result => {
+        		if (result[1] == 1) {
+        			contractController.deleteActiveContracts(req.params.uuid)
+        			res.render('info', {
+        				title: 'Game deactivated',
+        				message: 'All contracts were removed.'
+        			})
+        		}
+        		else {
+		    		res.render('info', { 
+		    			title: 'Failure',
+		    			message: 'Invalid parameters or game already deactivated.'
+		    		})
+        		}
+        	})
+        	.catch(err => {
+        		res.render('shitHappens')
+        	})
+        }
+    }
+    ]
 
 // Handle Game invitation on POST
 exports.gameInvitationPost = [
@@ -217,36 +277,39 @@ exports.gameInvitationPost = [
         }
         else {
         	// Send email and update game status
-        	GameModel.findOne({
+        	Game.findOne({
         		where: {
         			uuid: req.params.uuid,
         			masterCode: req.body.masterCode
-        		},
-        		returning: true
+        		}
         	})
         	.then(result => {
         		if (result) {
 		    		// Send email
-		    		var gameURL = req.protocol + '://' + req.get('host') + '/games/'
+		    		var gameURL = baseURL.baseURL + '/games/'
+		    		var base64URLEmail = base64url(req.body.email)
 		    		var message = 'Hey,\n\nJoin my killer party by following this link :\
-		    		\n' + gameURL + result.uuid + '/join\
+		    		\n' + gameURL + result.uuid + '/join?email=' + base64URLEmail + '&partyCode=' + result.partyCode + '\
 		    		\n\nSee ya soon.'
 		    		mailer.sendMail(req.body.email, 'Join my killer party', message)
 		    		.then(function(info){
 		    			res.render('info', { 
 		    				title: 'Invitation sent',
-		    				message: 'An email was sent from killerpi.noreply@gmail.com to ' + req.body.email,
+		    				message: 'An invitation email was sent to ' + req.body.email,
 		    				details : ['Tell your friend to check the spam box']
 		    			})
 		    		}).catch(function(err){
 		    			res.render('info', { 
 		    				title: 'Invitation failure',
-		    				message: 'There was an issue while sending email from killerpi.noreply@gmail.com to ' + req.body.email
+		    				message: 'There was an issue while sending invitation email to ' + req.body.email
 		    			})
 		    		})
 		    	}
 		    	else {
-		    		res.render('shitHappens')
+		    		res.render('info', { 
+		    			title: 'Wrong code',
+		    			message: 'The master code you entered is wrong.'
+		    		})
 		    	}
 		    })
         	.catch(err => {
@@ -258,7 +321,7 @@ exports.gameInvitationPost = [
 
 // Display form to join a specific Game on GET
 exports.gameJoinForm = function(req, res) {
-	GameModel.findOne({
+	Game.findOne({
 		where: {
 			uuid: req.params.uuid
 		}
@@ -266,8 +329,14 @@ exports.gameJoinForm = function(req, res) {
 	.then(result => {
 		if (result) {
 			if (result.status==='PENDING') {
-				res.render('gameJoinForm', { 
-					game: result
+				var email
+				if (req.query.email) {
+					email = base64url.decode(req.query.email)
+				}
+				res.render('gameJoinForm', {
+					game: result,
+					email: email,
+					partyCode: req.query.partyCode
 				})
 			}
 			else {
@@ -316,21 +385,19 @@ exports.gameJoinPost = [
             return
         }
         else {
-        	GameModel.findOne({
+        	Game.findOne({
         		where: {
         			uuid: req.params.uuid,
         			partyCode: req.body.partyCode
-        		},
-        		returning: true
+        		}
         	})
         	.then(game => {
         		if (game) {
-        			PlayerModel.findOne({
+        			Player.findOne({
         				where: {
         					gameUuid: req.params.uuid,
         					email: req.body.email
-        				},
-        				returning: true
+        				}
         			})
         			.then(player => {
         				if (player) {
@@ -344,8 +411,8 @@ exports.gameJoinPost = [
         					var playerCode = Math.floor(Math.random() * 9000 + 1000)
         					var uuid = uuidv4()
 
-				            // Create a PlayerModel object with escaped and trimmed data.
-				            PlayerModel.create({
+				            // Create a Player object with escaped and trimmed data.
+				            Player.create({
 				            	uuid: uuid,
 				            	creationDate: nowISO8601,
 				            	gameUuid: game.uuid,
@@ -356,7 +423,7 @@ exports.gameJoinPost = [
 				            })
 				            .then(result => {
 					    		// Create email message
-					    		var attemptURL = req.protocol + '://' + req.get('host') + '/attempts?gameUuid=' + game.uuid + '&playerUuid=' + uuid
+					    		var attemptURL = baseURL.baseURL + '/attempts?gameUuid=' + game.uuid + '&playerUuid=' + uuid
 					    		var message = 'Hey,\n\nYou\'ve successfully joined party "' + game.name + '".\
 					    		\n\nTo attempt a kill you need to use the following link:\
 					    		\n' + attemptURL + '\
