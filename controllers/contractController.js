@@ -16,14 +16,14 @@ exports.generateContracts = function(gameUuid) {
             }
         })
         .catch(err => {
-            console.log('Failed to get players to generate contracts: ' + gameUuid)
+            console.error('contractController: Failed to get players to generate contracts: ' + gameUuid + '\n' + err)
         })
     }
 
     var getChallenges = function(){
         return Challenge.findAll()
         .catch(err => {
-            console.log('Failed to get challenges.')
+            console.error('contractController: Failed to get challenges.\n' + err)
         })
     }
 
@@ -40,7 +40,7 @@ exports.generateContracts = function(gameUuid) {
             }
         }
         else {
-            console.log('No players or no challenges.')
+            console.error('contractController: No players or no challenges.')
         }
     })
 }
@@ -75,10 +75,10 @@ exports.deleteActiveContracts = function(gameUuid) {
         returning: true
     })
     .then(result => {
-        console.log('Succeed to revoke all active contracts associated with game: ' + gameUuid)
+        console.error('contractController: Succeed to revoke all active contracts associated with game: ' + gameUuid)
     })
     .catch(err => {
-        console.log('Failed to revoke all active contracts associated with game: ' + gameUuid)
+        console.error('contractController: Failed to revoke all active contracts associated with game: ' + gameUuid + '\n' + err)
     })
 }
 
@@ -99,7 +99,7 @@ exports.createAndSendContract = function(gameUuid, killerUuid, victimUuid, chall
         sendContractEmail(contract)
     })
     .catch(err => {
-        console.log('Failed to create contract.')
+        console.error('contractController: Failed to create contract.\n' + err)
     })
 }
 
@@ -111,7 +111,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.log('Failed to retrieve game info.')
+            console.error('contractController: Failed to retrieve game info.\n' + err)
         })
     }
 
@@ -122,7 +122,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.log('Failed to retrieve killer info.')
+            console.error('contractController: Failed to retrieve killer info.\n' + err)
         })
     }
 
@@ -133,7 +133,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.log('Failed to retrieve victim info.')
+            console.error('contractController: Failed to retrieve victim info.\n' + err)
         })
     }
 
@@ -144,7 +144,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.log('Failed to retrieve challenge info.')
+            console.error('contractController: Failed to retrieve challenge info.\n' + err)
         })
     }
 
@@ -164,13 +164,13 @@ function sendContractEmail(contract) {
             
             mailer.sendMail(killer.email, 'Vous avez un nouveau contrat', message)
             .then(function(info) {
-                console.log('A contract email was sent to ' + killer.email)
+                console.error('contractController: A contract email was sent to ' + killer.email + '\n' + err)
             }).catch(function(err) {
-                console.log('There was an issue while sending contract email to ' + killer.email)
+                console.error('contractController: There was an issue while sending contract email to ' + killer.email + '\n' + err)
             })
         }
         else {
-            console.log('Inconsistent data for game, killer, victim or challenge. Cannot create contract email.')
+            console.error('contractController: Inconsistent data for game, killer, victim or challenge. Cannot create contract email.')
         }
     })
 }
@@ -196,7 +196,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 returning: true
             })
             .catch(err => {
-                console.log('Failed to update victim contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')')
+                console.error('contractController: Failed to update victim contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
             })
         }
 
@@ -213,7 +213,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 returning: true
             })
             .catch(err => {
-                console.log('Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')')
+                console.error('contractController: Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
             })
         }
 
@@ -223,11 +223,11 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
             }
             else {
-                console.log('Inconsistent number of updated contracts')
+                console.error('contractController: Inconsistent number of updated contracts')
             }
         })
     })
     .catch(err => {
-        console.log('Failed to get active contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ') ' + err)
+        console.error('contractController: Failed to get active contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
     })
 }

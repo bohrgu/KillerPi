@@ -23,6 +23,7 @@ exports.gameGetAll = function(req, res) {
 		})
 	})
 	.catch(err => {
+        console.error('gameController: Failed to get all games and count.\n' + err)
 		res.render('shitHappens')
 	})
 }
@@ -103,6 +104,7 @@ exports.gameCreationPost = [
 		    		})
 		    	})
             .catch(err => {
+                console.error('gameController: Failed to insert new game into table.\n' + err)
             	res.render('shitHappens')
             })
         }
@@ -118,6 +120,7 @@ exports.gameGetOne = function(req, res) {
 			}
 		})
 		.catch(err => {
+            console.error('gameController: Failed to get game.\n' + err)
 			res.render('shitHappens')
 		})
 	}
@@ -129,6 +132,7 @@ exports.gameGetOne = function(req, res) {
 			}
 		})
 		.catch(err => {
+            console.error('gameController: Failed to get game players.\n' + err)
 			res.render('shitHappens')
 		})
 	}
@@ -190,6 +194,7 @@ exports.gameActivationPost = [
         		}
         	})
         	.catch(err => {
+                console.error('gameController: Failed to activate game.\n' + err)
         		res.render('shitHappens')
         	})
         }
@@ -244,6 +249,7 @@ exports.gameDeactivationPost = [
         		}
         	})
         	.catch(err => {
+                console.error('gameController: Failed to deactivate game.\n' + err)
         		res.render('shitHappens')
         	})
         }
@@ -313,6 +319,7 @@ exports.gameInvitationPost = [
 		    	}
 		    })
         	.catch(err => {
+                console.error('gameController: Failed to get game.\n' + err)
         		res.render('shitHappens')
         	})
         }
@@ -347,10 +354,12 @@ exports.gameJoinForm = function(req, res) {
 			}
 		}
 		else {
+            console.error('gameController: No game returned by query.\n')
 			res.render('shitHappens')
 		}
 	})
 	.catch(err => {
+        console.error('gameController: Failed to get game.\n' + err)
 		res.render('shitHappens')
 	})
 }
@@ -443,19 +452,23 @@ exports.gameJoinPost = [
 					    		})
 					    	})
 				            .catch(err => {
+                                console.error('gameController: Failed to insert new player into table.\n' + err)
 				            	res.render('shitHappens')
 				            })
 				        }
 				    })
         			.catch(err => {
+                        console.error('gameController: Failed to get player for a given email in the given game.\n' + err)
         				res.render('shitHappens')
         			})
         		}
         		else {
+                    console.error('gameController: No game returned by query.\n')
         			res.render('shitHappens')
         		}
         	})
         	.catch(err => {
+                console.error('gameController: Failed to get game.\n' + err)
         		res.render('shitHappens')
         	})
         }

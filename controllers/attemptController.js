@@ -25,6 +25,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
+            console.error('attemptController: Failed to get game.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -38,6 +39,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
+            console.error('attemptController: Failed to get killer contract.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -49,6 +51,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
+            console.error('attemptController: Failed to get killer player.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -63,6 +66,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
+            console.error('attemptController: Failed to get the list of possible victims.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -142,6 +146,7 @@ exports.attemptKillPost = [
                             }
                         })
                         .catch(err => {
+                            console.error('attemptController: Failed to get killer contract.\n' + err)
                             res.render('shitHappens')
                         })
                     }
@@ -155,6 +160,7 @@ exports.attemptKillPost = [
                             }
                         })
                         .catch(err => {
+                            console.error('attemptController: Failed to get victim player.\n' + err)
                             res.render('shitHappens')
                         })
                     }
@@ -194,7 +200,6 @@ exports.attemptKillPost = [
                                     }
                                 })
                                 .then(result => {
-                                    console.log(result)
                                     if (result >= 3) {
                                         // Kill the killer by suicide for too many attempts
                                         Contract.findOne({
@@ -212,6 +217,7 @@ exports.attemptKillPost = [
                                             })
                                         })
                                         .catch(err => {
+                                            console.error('attemptController: Failed to get the contract of the killer of the killer (where the killer is the victim).\n' + err)
                                             res.render('shitHappens')
                                         })
                                     }
@@ -223,17 +229,20 @@ exports.attemptKillPost = [
                                     }
                                 })
                                 .catch(err => {
+                                    console.error('attemptController: Failed to get attempts count.\n' + err)
                                     res.render('shitHappens')
                                 })
                             }
                         })
                         .catch(err => {
+                            console.error('attemptController: Failed to insert new attempt into.\n' + err)
                             res.render('shitHappens')
                         })
                     })
                 }
             })
             .catch(err => {
+                console.error('attemptController: Failed to get killer player.\n' + err)
                 res.render('shitHappens')
             })
         }
