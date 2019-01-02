@@ -1,4 +1,5 @@
+const myLog = require('../utils/myLog')
 
 exports.gameGetAdminBoard = function(req, res) {
-    console.error('No admin route yet')
+    myLog.error('No admin route yet')
 }

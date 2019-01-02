@@ -7,6 +7,7 @@ var mailer = require('../utils/mailer')
 var Sequelize = require('sequelize')
 var sequelize = new Sequelize('sqlite:./Killer.db')
 var baseURL = require('../utils/baseURL')
+const myLog = require('../utils/myLog')
 
 exports.generateContracts = function(gameUuid) {
     var getPlayers = function(){
@@ -16,14 +17,14 @@ exports.generateContracts = function(gameUuid) {
             }
         })
         .catch(err => {
-            console.error('contractController: Failed to get players to generate contracts: ' + gameUuid + '\n' + err)
+            myLog.error('contractController: Failed to get players to generate contracts: ' + gameUuid + '\n' + err)
         })
     }
 
     var getChallenges = function(){
         return Challenge.findAll()
         .catch(err => {
-            console.error('contractController: Failed to get challenges.\n' + err)
+            myLog.error('contractController: Failed to get challenges.\n' + err)
         })
     }
 
@@ -40,7 +41,7 @@ exports.generateContracts = function(gameUuid) {
             }
         }
         else {
-            console.error('contractController: No players or no challenges.')
+            myLog.error('contractController: No players or no challenges.')
         }
     })
 }
@@ -75,10 +76,10 @@ exports.deleteActiveContracts = function(gameUuid) {
         returning: true
     })
     .then(result => {
-        console.error('contractController: Succeed to revoke all active contracts associated with game: ' + gameUuid)
+        myLog.log('contractController: Succeed to revoke all active contracts associated with game: ' + gameUuid)
     })
     .catch(err => {
-        console.error('contractController: Failed to revoke all active contracts associated with game: ' + gameUuid + '\n' + err)
+        myLog.error('contractController: Failed to revoke all active contracts associated with game: ' + gameUuid + '\n' + err)
     })
 }
 
@@ -99,7 +100,7 @@ exports.createAndSendContract = function(gameUuid, killerUuid, victimUuid, chall
         sendContractEmail(contract)
     })
     .catch(err => {
-        console.error('contractController: Failed to create contract.\n' + err)
+        myLog.error('contractController: Failed to create contract.\n' + err)
     })
 }
 
@@ -111,7 +112,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.error('contractController: Failed to retrieve game info.\n' + err)
+            myLog.error('contractController: Failed to retrieve game info.\n' + err)
         })
     }
 
@@ -122,7 +123,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.error('contractController: Failed to retrieve killer info.\n' + err)
+            myLog.error('contractController: Failed to retrieve killer info.\n' + err)
         })
     }
 
@@ -133,7 +134,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.error('contractController: Failed to retrieve victim info.\n' + err)
+            myLog.error('contractController: Failed to retrieve victim info.\n' + err)
         })
     }
 
@@ -144,7 +145,7 @@ function sendContractEmail(contract) {
             }
         })
         .catch(err => {
-            console.error('contractController: Failed to retrieve challenge info.\n' + err)
+            myLog.error('contractController: Failed to retrieve challenge info.\n' + err)
         })
     }
 
@@ -164,13 +165,13 @@ function sendContractEmail(contract) {
             
             mailer.sendMail(killer.email, 'Vous avez un nouveau contrat', message)
             .then(function(info) {
-                console.error('contractController: A contract email was sent to ' + killer.email + '\n' + err)
+                myLog.log('contractController: A contract email was sent to ' + killer.email)
             }).catch(function(err) {
-                console.error('contractController: There was an issue while sending contract email to ' + killer.email + '\n' + err)
+                myLog.error('contractController: There was an issue while sending contract email to ' + killer.email + '\n' + err)
             })
         }
         else {
-            console.error('contractController: Inconsistent data for game, killer, victim or challenge. Cannot create contract email.')
+            myLog.error('contractController: Inconsistent data for game, killer, victim or challenge. Cannot create contract email.')
         }
     })
 }
@@ -196,7 +197,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 returning: true
             })
             .catch(err => {
-                console.error('contractController: Failed to update victim contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
+                myLog.error('contractController: Failed to update victim contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
             })
         }
 
@@ -213,7 +214,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 returning: true
             })
             .catch(err => {
-                console.error('contractController: Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
+                myLog.error('contractController: Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
             })
         }
 
@@ -223,11 +224,11 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
             }
             else {
-                console.error('contractController: Inconsistent number of updated contracts')
+                myLog.error('contractController: Inconsistent number of updated contracts')
             }
         })
     })
     .catch(err => {
-        console.error('contractController: Failed to get active contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
+        myLog.error('contractController: Failed to get active contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
     })
 }

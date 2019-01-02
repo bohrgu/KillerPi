@@ -7,6 +7,7 @@ var contractController = require('./contractController')
 var Sequelize = require('sequelize')
 var sequelize = new Sequelize('sqlite:./Killer.db')
 const Op = Sequelize.Op;
+const myLog = require('../utils/myLog')
 
 const { body, validationResult } = require('express-validator/check')
 const { sanitizeBody } = require('express-validator/filter')
@@ -25,7 +26,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
-            console.error('attemptController: Failed to get game.\n' + err)
+            myLog.error('attemptController: Failed to get game.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -39,7 +40,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
-            console.error('attemptController: Failed to get killer contract.\n' + err)
+            myLog.error('attemptController: Failed to get killer contract.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -51,7 +52,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
-            console.error('attemptController: Failed to get killer player.\n' + err)
+            myLog.error('attemptController: Failed to get killer player.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -66,7 +67,7 @@ exports.attemptKillForm = function(req, res) {
             }
         })
         .catch(err => {
-            console.error('attemptController: Failed to get the list of possible victims.\n' + err)
+            myLog.error('attemptController: Failed to get the list of possible victims.\n' + err)
             res.render('shitHappens')
         })
     }
@@ -146,7 +147,7 @@ exports.attemptKillPost = [
                             }
                         })
                         .catch(err => {
-                            console.error('attemptController: Failed to get killer contract.\n' + err)
+                            myLog.error('attemptController: Failed to get killer contract.\n' + err)
                             res.render('shitHappens')
                         })
                     }
@@ -160,7 +161,7 @@ exports.attemptKillPost = [
                             }
                         })
                         .catch(err => {
-                            console.error('attemptController: Failed to get victim player.\n' + err)
+                            myLog.error('attemptController: Failed to get victim player.\n' + err)
                             res.render('shitHappens')
                         })
                     }
@@ -217,7 +218,7 @@ exports.attemptKillPost = [
                                             })
                                         })
                                         .catch(err => {
-                                            console.error('attemptController: Failed to get the contract of the killer of the killer (where the killer is the victim).\n' + err)
+                                            myLog.error('attemptController: Failed to get the contract of the killer of the killer (where the killer is the victim).\n' + err)
                                             res.render('shitHappens')
                                         })
                                     }
@@ -229,20 +230,20 @@ exports.attemptKillPost = [
                                     }
                                 })
                                 .catch(err => {
-                                    console.error('attemptController: Failed to get attempts count.\n' + err)
+                                    myLog.error('attemptController: Failed to get attempts count.\n' + err)
                                     res.render('shitHappens')
                                 })
                             }
                         })
                         .catch(err => {
-                            console.error('attemptController: Failed to insert new attempt into.\n' + err)
+                            myLog.error('attemptController: Failed to insert new attempt into.\n' + err)
                             res.render('shitHappens')
                         })
                     })
                 }
             })
             .catch(err => {
-                console.error('attemptController: Failed to get killer player.\n' + err)
+                myLog.error('attemptController: Failed to get killer player.\n' + err)
                 res.render('shitHappens')
             })
         }
