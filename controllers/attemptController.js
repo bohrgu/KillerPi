@@ -70,7 +70,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     Promise.join(getGame(), getContract(), getPlayer(), getVictims(), function(game, contract, player, victims){
-        if (models.Game.status!=='ACTIVE') {
+        if (game.status!=='ACTIVE') {
             res.render('info', { 
                 title: 'No active game',
                 message: 'This game is outdated or not active yet.'
@@ -163,7 +163,7 @@ exports.attemptKillPost = [
                         })
                     }
 
-                    sequelize.Promise.join(getContract(), getVictim(), function(contract, victim){
+                    Promise.join(getContract(), getVictim(), function(contract, victim){
                         var status = 'FAILURE'
                         if (contract && victim) {
                             status = 'SUCCESS'
