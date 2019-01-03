@@ -4,8 +4,6 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 var helmet = require('helmet');
-var Sequelize = require('sequelize')
-const myLog = require('./utils/myLog')
 
 var indexRouter = require('./routes/indexRouter')
 var gameRouter = require('./routes/gameRouter')
@@ -13,21 +11,6 @@ var attemptRouter = require('./routes/attemptRouter')
 var adminRouter = require('./routes/adminRouter')
 
 var app = express()
-
-// Set up database connection
-// Use simple sqlite3 database for development
-var devDatabaseURI = 'sqlite:./Killer.db'
-global.databaseURI = process.env.DATABASE_URI || devDatabaseURI
-myLog.log(global.databaseURI)
-var sequelize = new Sequelize(global.databaseURI)
-sequelize
-.authenticate()
-.then(() => {
-	myLog.log('Connection has been established successfully.');
-})
-.catch(err => {
-	myLog.error('Unable to connect to the database:\n', err);
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))

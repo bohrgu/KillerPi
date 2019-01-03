@@ -1,12 +1,9 @@
 const uuidv4 = require('uuid/v4')
-var Game = require('../models/game')
-var Player = require('../models/player')
-var Contract = require('../models/contract')
-var Attempt = require('../models/attempt')
+var models = require('../models')
 var contractController = require('./contractController')
 var Sequelize = require('sequelize')
-var sequelize = new Sequelize('sqlite:./Killer.db')
 const Op = Sequelize.Op
+var Promise = require('bluebird')
 const myLog = require('../utils/myLog')
 
 const { body, validationResult } = require('express-validator/check')
@@ -20,19 +17,19 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getGame = function(){
-        return Game.findOne({
+        return models.Game.findOne({
             where: {
                 uuid: req.query.gameUuid
             }
         })
         .catch(err => {
-            myLog.error('attemptController: Failed to get game.\n' + err)
+            myLog.error('attemptController: Failed to get models.Game.\n' + err)
             res.render('shitHappens')
         })
     }
 
     var getContract = function(){
-        return Contract.findOne({
+        return models.Contract.findOne({
             where: {
                 gameUuid: req.query.gameUuid,
                 killerUuid: req.query.playerUuid,
@@ -46,7 +43,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getPlayer = function(){
-        return Player.findOne({
+        return models.Player.findOne({
             where: {
                 uuid: req.query.playerUuid
             }
@@ -58,7 +55,7 @@ exports.attemptKillForm = function(req, res) {
     }
 
     var getVictims = function(){
-        return Player.findAll({
+        return models.Player.findAll({
             where: {
                 gameUuid: req.query.gameUuid,
                 uuid: {
@@ -72,8 +69,8 @@ exports.attemptKillForm = function(req, res) {
         })
     }
 
-    sequelize.Promise.join(getGame(), getContract(), getPlayer(), getVictims(), function(game, contract, player, victims){
-        if (game.status!=='ACTIVE') {
+    Promise.join(getGame(), getContract(), getPlayer(), getVictims(), function(game, contract, player, victims){
+        if (models.Game.status!=='ACTIVE') {
             res.render('info', { 
                 title: 'No active game',
                 message: 'This game is outdated or not active yet.'
@@ -121,7 +118,7 @@ exports.attemptKillPost = [
             return
         }
         else {
-            Player.findOne({
+            models.Player.findOne({
                 where: {
                     gameUuid: req.query.gameUuid,
                     uuid: req.query.playerUuid,
@@ -138,7 +135,7 @@ exports.attemptKillPost = [
                 }
                 else {
                     var getContract = function(){
-                        return Contract.findOne({
+                        return models.Contract.findOne({
                             where: {
                                 gameUuid: req.query.gameUuid,
                                 killerUuid: req.query.playerUuid,
@@ -153,7 +150,7 @@ exports.attemptKillPost = [
                     }
 
                     var getVictim = function(){
-                        return Player.findOne({
+                        return models.Player.findOne({
                             where: {
                                 gameUuid: req.query.gameUuid,
                                 uuid: req.body.victimUuid,
@@ -175,7 +172,7 @@ exports.attemptKillPost = [
                         var uuid = uuidv4()
 
                         // Create a Attempt object with escaped and trimmed data.
-                        Attempt.create({
+                        models.Attempt.create({
                             uuid: uuid,
                             creationDate: nowISO8601,
                             gameUuid: req.query.gameUuid,
@@ -193,7 +190,7 @@ exports.attemptKillPost = [
                             }
                             else {
                                 // Count previous attempts
-                                Attempt.count({
+                                models.Attempt.count({
                                     where : {
                                         gameUuid: req.query.gameUuid,
                                         killerUuid: req.query.playerUuid,
@@ -203,7 +200,7 @@ exports.attemptKillPost = [
                                 .then(result => {
                                     if (result >= 3) {
                                         // Kill the killer by suicide for too many attempts
-                                        Contract.findOne({
+                                        models.Contract.findOne({
                                             where: {
                                                 gameUuid: req.query.gameUuid,
                                                 victimUuid: req.query.playerUuid,

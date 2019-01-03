@@ -1,0 +1,9 @@
+{
+  "development": {
+    "dialect": "sqlite",
+    "storage": "./Killer.db"
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL"
+  }
+}

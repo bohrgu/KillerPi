@@ -1,1 +1,1 @@
-exports.baseURL = 'http://localhost:3000'
+exports.baseURL = 'https://killerparty.herokuapp.com'

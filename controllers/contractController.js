@@ -1,17 +1,13 @@
 const uuidv4 = require('uuid/v4')
-var Player = require('../models/player')
-var Contract = require('../models/contract')
-var Challenge = require('../models/challenge')
-var Game = require('../models/game')
+var models = require('../models')
 var mailer = require('../utils/mailer')
-var Sequelize = require('sequelize')
-var sequelize = new Sequelize('sqlite:./Killer.db')
+var Promise = require('bluebird')
 var baseURL = require('../utils/baseURL')
 const myLog = require('../utils/myLog')
 
 exports.generateContracts = function(gameUuid) {
     var getPlayers = function(){
-        return Player.findAll({
+        return models.Player.findAll({
             where: {
                 gameUuid: gameUuid
             }
@@ -22,13 +18,13 @@ exports.generateContracts = function(gameUuid) {
     }
 
     var getChallenges = function(){
-        return Challenge.findAll()
+        return models.Challenge.findAll()
         .catch(err => {
             myLog.error('contractController: Failed to get challenges.\n' + err)
         })
     }
 
-    sequelize.Promise.join(getPlayers(), getChallenges(), function(players, challenges){
+    Promise.join(getPlayers(), getChallenges(), function(players, challenges){
         if (players.length > 0 && challenges.length > 0) {
             shuffle(players)
             var i
@@ -66,7 +62,7 @@ function shuffle(array) {
 }
 
 exports.deleteActiveContracts = function(gameUuid) {
-    Contract.update({
+    models.Contract.update({
         status: 'REVOKED',
     }, {
         where: {
@@ -87,7 +83,7 @@ exports.createAndSendContract = function(gameUuid, killerUuid, victimUuid, chall
     var uuid = uuidv4()
     var nowISO8601 = new Date().toISOString().split('.')[0]+'Z'
 
-    Contract.create({
+    models.Contract.create({
         uuid: uuid,
         creationDate: nowISO8601,
         gameUuid: gameUuid,
@@ -106,7 +102,7 @@ exports.createAndSendContract = function(gameUuid, killerUuid, victimUuid, chall
 
 function sendContractEmail(contract) {
     var getGame = function(){
-        return Game.findOne({
+        return models.Game.findOne({
             where: {
                 uuid: contract.gameUuid
             }
@@ -117,7 +113,7 @@ function sendContractEmail(contract) {
     }
 
     var getKiller = function(){
-        return Player.findOne({
+        return models.Player.findOne({
             where: {
                 uuid: contract.killerUuid
             }
@@ -128,7 +124,7 @@ function sendContractEmail(contract) {
     }
 
     var getVictim = function(){
-        return Player.findOne({
+        return models.Player.findOne({
             where: {
                 uuid: contract.victimUuid
             }
@@ -139,7 +135,7 @@ function sendContractEmail(contract) {
     }
 
     var getChallenge = function(){
-        return Challenge.findOne({
+        return models.Challenge.findOne({
             where: {
                 uuid: contract.challengeUuid
             }
@@ -149,7 +145,7 @@ function sendContractEmail(contract) {
         })
     }
 
-    sequelize.Promise.join(getGame(), getKiller(), getVictim(), getChallenge(), function(game, killer, victim, challenge){
+    Promise.join(getGame(), getKiller(), getVictim(), getChallenge(), function(game, killer, victim, challenge){
         if (game && killer && victim && challenge) {
             // Create email message
             var attemptURL = baseURL.baseURL + '/attempts?gameUuid=' + contract.gameUuid + '&playerUuid=' + contract.killerUuid
@@ -178,7 +174,7 @@ function sendContractEmail(contract) {
 
 exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatus) {
     // Get victim contract to transfer a copy to the killer
-    Contract.findOne({
+    models.Contract.findOne({
         where : {
             gameUuid: gameUuid,
             killerUuid: victimUuid,
@@ -188,7 +184,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
     .then(contract => {
         // Update victim contract with the given status
         var updateVictimContract = function(){
-            return Contract.update({
+            return models.Contract.update({
                 status: victimStatus
             }, {
                 where: {
@@ -203,7 +199,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
 
         // Update killer contract with fulfilled status
         var updateKillerContract = function(){
-            return Contract.update({
+            return models.Contract.update({
                 status: 'FULFILLED'
             }, {
                 where: {
@@ -218,7 +214,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
             })
         }
 
-        sequelize.Promise.join(updateVictimContract(), updateKillerContract(), function(victimResult, killerResult){
+        Promise.join(updateVictimContract(), updateKillerContract(), function(victimResult, killerResult){
             if (victimResult[1] == 1 && killerResult[1] == 1) {
                 // Copy and transfer victim contract to the killer as his new contract
                 exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)

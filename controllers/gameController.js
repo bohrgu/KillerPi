@@ -1,20 +1,18 @@
 const uuidv4 = require('uuid/v4')
-var Game = require('../models/game')
-var Player = require('../models/player')
-var Sequelize = require('sequelize')
-var sequelize = new Sequelize('sqlite:./Killer.db')
+var models = require('../models')
 var mailer = require('../utils/mailer')
 const base64url = require('base64url')
 var contractController = require('./contractController')
 var baseURL = require('../utils/baseURL')
 const myLog = require('../utils/myLog')
+var Promise = require('bluebird')
 
 const { body, validationResult } = require('express-validator/check')
 const { sanitizeBody } = require('express-validator/filter')
 
 // Display a list of all Games
 exports.gameGetAll = function(req, res) {
-	Game.findAndCountAll({
+	models.Game.findAndCountAll({
 		order: [['name', 'ASC']]
 	})
 	.then(result => {
@@ -70,7 +68,7 @@ exports.gameCreationPost = [
         	var uuid = uuidv4()
 
             // Create a Game object with escaped and trimmed data.
-            Game.create({
+            models.Game.create({
             	uuid: uuid,
             	creationDate: nowISO8601,
             	name: req.body.name,
@@ -115,7 +113,7 @@ exports.gameCreationPost = [
 // Display detail page for a specific Game
 exports.gameGetOne = function(req, res) {
 	var getGame = function(){
-		return Game.findOne({
+		return models.Game.findOne({
 			where: {
 				uuid: req.params.uuid
 			}
@@ -127,7 +125,7 @@ exports.gameGetOne = function(req, res) {
 	}
 
 	var getPlayers = function(){
-		return Player.findAll({
+		return models.Player.findAll({
 			where: {
 				gameUuid: req.params.uuid
 			}
@@ -138,7 +136,7 @@ exports.gameGetOne = function(req, res) {
 		})
 	}
 
-	sequelize.Promise.join(getGame(), getPlayers(), function(game, players){
+	Promise.join(getGame(), getPlayers(), function(game, players){
 		// TODO: deactivate game if end date is in the past
 		res.render('gameDetail', {
 			game: game,
@@ -169,7 +167,7 @@ exports.gameActivationPost = [
             return
         }
         else {
-        	Game.update({
+        	models.Game.update({
         		status: 'ACTIVE',
         	}, {
         		where: {
@@ -224,7 +222,7 @@ exports.gameDeactivationPost = [
             return
         }
         else {
-        	Game.update({
+        	models.Game.update({
         		status: 'PENDING',
         	}, {
         		where: {
@@ -284,7 +282,7 @@ exports.gameInvitationPost = [
         }
         else {
         	// Send email and update game status
-        	Game.findOne({
+        	models.Game.findOne({
         		where: {
         			uuid: req.params.uuid,
         			masterCode: req.body.masterCode
@@ -329,7 +327,7 @@ exports.gameInvitationPost = [
 
 // Display form to join a specific Game on GET
 exports.gameJoinForm = function(req, res) {
-	Game.findOne({
+	models.Game.findOne({
 		where: {
 			uuid: req.params.uuid
 		}
@@ -395,7 +393,7 @@ exports.gameJoinPost = [
             return
         }
         else {
-        	Game.findOne({
+        	models.Game.findOne({
         		where: {
         			uuid: req.params.uuid,
         			partyCode: req.body.partyCode
@@ -403,7 +401,7 @@ exports.gameJoinPost = [
         	})
         	.then(game => {
         		if (game) {
-        			Player.findOne({
+        			models.Player.findOne({
         				where: {
         					gameUuid: req.params.uuid,
         					email: req.body.email
@@ -422,7 +420,7 @@ exports.gameJoinPost = [
         					var uuid = uuidv4()
 
 				            // Create a Player object with escaped and trimmed data.
-				            Player.create({
+				            models.Player.create({
 				            	uuid: uuid,
 				            	creationDate: nowISO8601,
 				            	gameUuid: game.uuid,

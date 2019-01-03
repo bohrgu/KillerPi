@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "base64url": "^3.0.1",
+    "bluebird": "^3.5.3",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
@@ -24,6 +25,7 @@
     "pg-hstore": "^2.3.2",
     "pug": "2.0.0-beta11",
     "sequelize": "^4.42.0",
+    "sequelize-cli": "^5.4.0",
     "sqlite3": "^4.0.4",
     "uuid": "^3.3.2"
   },

@@ -1,21 +1,19 @@
-var Sequelize = require('sequelize');
-var sequelize = new Sequelize('sqlite:./Killer.db')
+'use strict';
+module.exports = (sequelize, DataTypes) => {
+	var Challenge = sequelize.define('Challenge', {
+		uuid: {
+			field: 'UUID',
+			type: DataTypes.STRING,
+			primaryKey: true
+		},
+		description: {
+			field: 'DESCRIPTION',
+			type: DataTypes.STRING
+		}
+	}, {
+		timestamps: false,
+		freezeTableName: true
+	})
 
-
-var Challenge = sequelize.define('challenge', {
-	uuid: {
-		field: 'UUID',
-		type: Sequelize.STRING,
-		primaryKey: true
-	},
-	description: {
-		field: 'DESCRIPTION',
-		type: Sequelize.STRING
-	}
-}, {
-	timestamps: false,
-	freezeTableName: true
-})
-
-// Export model
-module.exports = Challenge
+	return Challenge;
+};

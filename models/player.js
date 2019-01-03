@@ -1,41 +1,39 @@
-var Sequelize = require('sequelize');
-var sequelize = new Sequelize('sqlite:./Killer.db')
+'use strict';
+module.exports = (sequelize, DataTypes) => {
+	var Player = sequelize.define('Player', {
+		uuid: {
+			field: 'UUID',
+			type: DataTypes.STRING,
+			primaryKey: true
+		},
+		creationDate: {
+			field: 'CREATION_DATE',
+			type: DataTypes.STRING
+		},
+		gameUuid: {
+			field: 'GAME_UUID',
+			type: DataTypes.STRING
+		},
+		firstName: {
+			field: 'FIRST_NAME',
+			type: DataTypes.STRING
+		},
+		lastName: {
+			field: 'LAST_NAME',
+			type: DataTypes.STRING
+		},
+		email: {
+			field: 'EMAIL',
+			type: DataTypes.STRING
+		},
+		code: {
+			field: 'CODE',
+			type: DataTypes.STRING
+		}
+	}, {
+		timestamps: false,
+		freezeTableName: true
+	})
 
-
-var Player = sequelize.define('player', {
-	uuid: {
-		field: 'UUID',
-		type: Sequelize.STRING,
-		primaryKey: true
-	},
-	creationDate: {
-		field: 'CREATION_DATE',
-		type: Sequelize.STRING
-	},
-	gameUuid: {
-		field: 'GAME_UUID',
-		type: Sequelize.STRING
-	},
-	firstName: {
-		field: 'FIRST_NAME',
-		type: Sequelize.STRING
-	},
-	lastName: {
-		field: 'LAST_NAME',
-		type: Sequelize.STRING
-	},
-	email: {
-		field: 'EMAIL',
-		type: Sequelize.STRING
-	},
-	code: {
-		field: 'CODE',
-		type: Sequelize.STRING
-	}
-}, {
-	timestamps: false,
-	freezeTableName: true
-})
-
-// Export model
-module.exports = Player
+	return Player;
+};
