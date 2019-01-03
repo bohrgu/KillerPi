@@ -54,7 +54,7 @@ exports.gameCreationPost = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render form again with sanitized values/errors messages.
-            res.render('gameForm', { 
+            res.render('gameCreationForm', { 
             	game: req.body,
             	errors: errors.array() 
             })
