@@ -4,11 +4,11 @@ INSERT INTO "Challenge" VALUES ('57911f48-3d85-44e8-a21b-c9bdbaa2f506', 'chanter
 INSERT INTO "Challenge" VALUES ('8cf326fe-0e3e-4402-9427-ddfbdc8dffdc', 'sauter à cloche pied');
 INSERT INTO "Challenge" VALUES ('69e6ff3c-bf63-44ac-a3bc-37faff5faf3f', 'faire 3 pompes');
 INSERT INTO "Challenge" VALUES ('da1af7e2-b80a-46e7-bb46-759f2133c1e9', 'boire ton verre cul sec');
-INSERT INTO "Challenge" VALUES ('7e3e1ff9-b1be-44b8-9313-032d8bd9cb5d', 'dire \"vive les lapins\"');
+INSERT INTO "Challenge" VALUES ('7e3e1ff9-b1be-44b8-9313-032d8bd9cb5d', 'dire "vive les lapins"');
 INSERT INTO "Challenge" VALUES ('28e45d12-84b9-4245-adb1-5e16ed2799c4', 'raconter une blague de Toto');
---INSERT INTO "Challenge" VALUES ('1c4a6bbc-c69a-4c1f-b52b-b4b03934f6ee', );
---INSERT INTO "Challenge" VALUES ('53661c09-b19f-4602-8043-a4737850f4c6', );
---INSERT INTO "Challenge" VALUES ('58d3a5cc-dd3f-48f4-9ae2-16494bdad239', );
+INSERT INTO "Challenge" VALUES ('1c4a6bbc-c69a-4c1f-b52b-b4b03934f6ee', 'danser la macarena');
+INSERT INTO "Challenge" VALUES ('53661c09-b19f-4602-8043-a4737850f4c6', 'sucer son pouce');
+INSERT INTO "Challenge" VALUES ('58d3a5cc-dd3f-48f4-9ae2-16494bdad239', 'siffler une mélodie');
 --INSERT INTO "Challenge" VALUES ('d8629e4a-fb5f-4acf-96e8-13d96a05fa9f', );
 --INSERT INTO "Challenge" VALUES ('52733e2c-cd48-4676-83b3-b7ddf0ee8294', );
 --INSERT INTO "Challenge" VALUES ('43bb0cf9-b99d-4953-8e99-908b8b9caa7d', );
