@@ -215,7 +215,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
         }
 
         Promise.join(updateVictimContract(), updateKillerContract(), function(victimResult, killerResult){
-            if (victimResult[1] == 1 && killerResult[1] == 1) {
+            if (victimResult && killerResult) {
                 // Copy and transfer victim contract to the killer as his new contract
                 exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
             }

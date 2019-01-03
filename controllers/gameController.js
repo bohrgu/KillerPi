@@ -178,7 +178,7 @@ exports.gameActivationPost = [
         		returning: true
         	})
         	.then(result => {
-        		if (result[1] == 1) {
+        		if (result) {
         			contractController.generateContracts(req.params.uuid)
         			res.render('info', {
         				title: 'Game activated',
@@ -233,7 +233,7 @@ exports.gameDeactivationPost = [
         		returning: true
         	})
         	.then(result => {
-        		if (result[1] == 1) {
+        		if (result) {
         			contractController.deleteActiveContracts(req.params.uuid)
         			res.render('info', {
         				title: 'Game deactivated',
