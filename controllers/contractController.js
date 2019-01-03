@@ -61,7 +61,7 @@ function shuffle(array) {
     return array
 }
 
-exports.deleteActiveContracts = function(gameUuid) {
+exports.revokeActiveContracts = function(gameUuid) {
     models.Contract.update({
         status: 'REVOKED',
     }, {
@@ -213,8 +213,28 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
 
         Promise.join(updateVictimContract(), updateKillerContract(), function(victimResult, killerResult){
             if (victimResult == 1 && killerResult == 1) {
-                // Copy and transfer victim contract to the killer as his new contract
-                exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
+                // Check if game is finished
+                if (killerUuid === contract.victimUuid) {
+                    models.Player.findOne({
+                        where: {
+                            uuid: killerUuid
+                        }
+                    })
+                    .then(player => {
+                        var message = 'Congratulations ' + player.firstName + ',\
+                        \n\nYou won the killer party !.\
+                        \n\nSee ya soon.'
+
+                        mailer.sendMail(player.email, 'You won the party !', message)
+                    })
+                    .catch(err => {
+                        myLog.error('contractController: Failed to retrieve winner info.\n' + err)
+                    })
+                }
+                else {
+                    // Copy and transfer victim contract to the killer as his new contract
+                    exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
+                }
             }
             else {
                 myLog.error('contractController: Inconsistent number of updated contracts')

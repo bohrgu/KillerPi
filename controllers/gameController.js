@@ -232,7 +232,7 @@ exports.gameDeactivationPost = [
         	})
         	.then(result => {
         		if (result == 1) {
-        			contractController.deleteActiveContracts(req.params.uuid)
+        			contractController.revokeActiveContracts(req.params.uuid)
         			res.render('info', {
         				title: 'Game deactivated',
         				message: 'All active contracts were revoked.'
