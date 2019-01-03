@@ -68,8 +68,7 @@ exports.deleteActiveContracts = function(gameUuid) {
         where: {
             gameUuid: gameUuid,
             status: 'ACTIVE'
-        },
-        returning: true
+        }
     })
     .then(result => {
         myLog.log('contractController: Succeed to revoke all active contracts associated with game: ' + gameUuid)
@@ -189,8 +188,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
             }, {
                 where: {
                     uuid: contract.uuid
-                },
-                returning: true
+                }
             })
             .catch(err => {
                 myLog.error('contractController: Failed to update victim contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
@@ -206,8 +204,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                     gameUuid: gameUuid,
                     killerUuid: killerUuid,
                     status: 'ACTIVE'
-                },
-                returning: true
+                }
             })
             .catch(err => {
                 myLog.error('contractController: Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
@@ -215,7 +212,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
         }
 
         Promise.join(updateVictimContract(), updateKillerContract(), function(victimResult, killerResult){
-            if (victimResult && killerResult) {
+            if (victimResult == 1 && killerResult == 1) {
                 // Copy and transfer victim contract to the killer as his new contract
                 exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
             }

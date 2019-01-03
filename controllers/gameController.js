@@ -174,11 +174,10 @@ exports.gameActivationPost = [
         			uuid: req.params.uuid,
         			masterCode: req.body.masterCode,
         			status: 'PENDING'
-        		},
-        		returning: true
+        		}
         	})
         	.then(result => {
-        		if (result) {
+        		if (result == 1) {
         			contractController.generateContracts(req.params.uuid)
         			res.render('info', {
         				title: 'Game activated',
@@ -229,11 +228,10 @@ exports.gameDeactivationPost = [
         			uuid: req.params.uuid,
         			masterCode: req.body.masterCode,
         			status: 'ACTIVE'
-        		},
-        		returning: true
+        		}
         	})
         	.then(result => {
-        		if (result) {
+        		if (result == 1) {
         			contractController.deleteActiveContracts(req.params.uuid)
         			res.render('info', {
         				title: 'Game deactivated',
