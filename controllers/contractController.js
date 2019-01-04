@@ -84,7 +84,7 @@ exports.sendContract = function(req, res) {
             uuid: req.params.uuid
         }
     })
-    .then(result => {
+    .then(contract => {
         sendContractEmail(contract)
         myLog.error('contractController: Succeed to get and send contract.\n')
         res.render('info', {
