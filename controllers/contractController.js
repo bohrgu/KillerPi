@@ -78,6 +78,26 @@ exports.revokeActiveContracts = function(gameUuid) {
     })
 }
 
+exports.sendContract = function(req, res) {
+    models.Contract.findOne({
+        where: {
+            uuid: req.params.uuid
+        }
+    })
+    .then(result => {
+        sendContractEmail(contract)
+        myLog.error('contractController: Succeed to get and send contract.\n')
+        res.render('info', {
+            title: 'Contract send',
+            message: 'Check your email spam box'
+        })
+    })
+    .catch(err => {
+        myLog.error('contractController: Failed to get and send contract.\n' + err)
+        res.render('shitHappens')
+    })
+}
+
 exports.createAndSendContract = function(gameUuid, killerUuid, victimUuid, challengeUuid) {
     var uuid = uuidv4()
     var nowISO8601 = new Date().toISOString().split('.')[0]+'Z'

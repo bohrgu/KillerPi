@@ -10,6 +10,7 @@ var indexRouter = require('./routes/indexRouter')
 var gameRouter = require('./routes/gameRouter')
 var attemptRouter = require('./routes/attemptRouter')
 var adminRouter = require('./routes/adminRouter')
+var contractRouter = require('./routes/contractRouter')
 
 var app = express()
 
@@ -28,6 +29,7 @@ app.use('/', indexRouter)
 app.use('/games', gameRouter)
 app.use('/attempts', attemptRouter)
 app.use('/admin', adminRouter)
+app.use('/contracts', contractRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
