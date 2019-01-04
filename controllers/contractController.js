@@ -98,6 +98,28 @@ exports.sendContract = function(req, res) {
     })
 }
 
+exports.sendAllActiveContracts = function(req, res) {
+    models.Contract.findAll({
+        where: {
+            gameUuid: req.params.uuid,
+            status: 'ACTIVE'
+        }
+    })
+    .then(contracts => {
+        contracts.forEach(function(contract) {
+            sendContractEmail(contract)
+        })
+        res.render('info', {
+            title: 'Contracts send',
+            message: 'All contracts of game ' + req.params.uuid + ' were send'
+        })
+    })
+    .catch(err => {
+        myLog.error('contractController: Failed to get game.\n' + err)
+        res.render('shitHappens')
+    })
+}
+
 exports.createAndSendContract = function(gameUuid, killerUuid, victimUuid, challengeUuid) {
     var uuid = uuidv4()
     var nowISO8601 = new Date().toISOString().split('.')[0]+'Z'
