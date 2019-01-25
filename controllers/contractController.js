@@ -2,7 +2,7 @@ const uuidv4 = require('uuid/v4')
 var models = require('../models')
 var mailer = require('../utils/mailer')
 var Promise = require('bluebird')
-var baseURL = require('../utils/baseURL')
+const baseURL = process.env.NODE_BASE_URL
 const myLog = require('../utils/myLog')
 
 exports.generateContracts = function(gameUuid) {
@@ -189,7 +189,7 @@ function sendContractEmail(contract) {
     Promise.join(getGame(), getKiller(), getVictim(), getChallenge(), function(game, killer, victim, challenge){
         if (game && killer && victim && challenge) {
             // Create email message
-            var attemptURL = baseURL.baseURL + '/attempts?gameUuid=' + contract.gameUuid + '&playerUuid=' + contract.killerUuid
+            var attemptURL = baseURL + '/attempts?gameUuid=' + contract.gameUuid + '&playerUuid=' + contract.killerUuid
             var message = 'Bonjour ' + killer.firstName + ',\
             \n\nCe mail concerne la partie de killer \"' + game.name + '\".\
             \n\nPour remplir ton nouveau contrat tu vas devoir tuer ' + victim.firstName + ' ' + victim.lastName + ' en le/la faisant ' + challenge.description + '\

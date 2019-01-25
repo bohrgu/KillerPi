@@ -3,7 +3,7 @@ var models = require('../models')
 var mailer = require('../utils/mailer')
 const base64url = require('base64url')
 var contractController = require('./contractController')
-var baseURL = require('../utils/baseURL')
+const baseURL = process.env.NODE_BASE_URL
 const myLog = require('../utils/myLog')
 var Promise = require('bluebird')
 
@@ -80,7 +80,7 @@ exports.gameCreationPost = [
             })
             .then(result => {
 		    		// Create email message
-		    		var gameURL = baseURL.baseURL + '/games/'
+		    		var gameURL = baseURL + '/games/'
 		    		var message = 'Hey,\n\nYour party "' + req.body.name + '" was created.\
 		    		\n\nTo invite players you can use the following management page:\
 		    		\n' + gameURL + uuid + '\
@@ -289,7 +289,7 @@ exports.gameInvitationPost = [
         	.then(result => {
         		if (result) {
 		    		// Send email
-		    		var gameURL = baseURL.baseURL + '/games/'
+		    		var gameURL = baseURL + '/games/'
 		    		var base64URLEmail = base64url(req.body.email)
 		    		var message = 'Hey,\n\nJoin my killer party by following this link :\
 		    		\n' + gameURL + result.uuid + '/join?email=' + base64URLEmail + '&partyCode=' + result.partyCode + '\
@@ -429,7 +429,7 @@ exports.gameJoinPost = [
 				            })
 				            .then(result => {
 					    		// Create email message
-					    		var attemptURL = baseURL.baseURL + '/attempts?gameUuid=' + game.uuid + '&playerUuid=' + uuid
+					    		var attemptURL = baseURL + '/attempts?gameUuid=' + game.uuid + '&playerUuid=' + uuid
 					    		var message = 'Hey,\n\nYou\'ve successfully joined party "' + game.name + '".\
 					    		\n\nTo attempt a kill you need to use the following link:\
 					    		\n' + attemptURL + '\

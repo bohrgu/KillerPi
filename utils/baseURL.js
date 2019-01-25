@@ -1,1 +1,0 @@
-exports.baseURL = 'https://killerparty.herokuapp.com'
