@@ -214,7 +214,7 @@ function sendContractEmail(contract) {
 }
 
 exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatus) {
-    // Get victim contract to transfer a copy to the killer
+    // Get victim contract
     models.Contract.findOne({
         where : {
             gameUuid: gameUuid,
@@ -249,7 +249,7 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                 }
             })
             .catch(err => {
-                myLog.error('contractController: Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + victimUuid + ')\n' + err)
+                myLog.error('contractController: Failed to update killer contract (gameUuid: ' + gameUuid + ' , killerUuid: ' + killerUuid + ')\n' + err)
             })
         }
 
@@ -274,8 +274,16 @@ exports.fulfillContract = function(gameUuid, killerUuid, victimUuid, victimStatu
                     })
                 }
                 else {
-                    // Copy and transfer victim contract to the killer as his new contract
-                    exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, contract.challengeUuid)
+                    // Create a new contract between the killer and the victim's target
+                    models.Challenge.findAll()
+                    .then(challenges => {
+                        var challengeRandomIndex = Math.floor(Math.random() * challenges.length)
+                        var newChallengeUuid = challenges[challengeRandomIndex].uuid
+                        exports.createAndSendContract(gameUuid, killerUuid, contract.victimUuid, newChallengeUuid)
+                    })
+                    .catch(err => {
+                        myLog.error('contractController: Failed to get challenges for a new contract.\n' + err)
+                    })
                 }
             }
             else {
