@@ -9,7 +9,7 @@ block content
     div.form-group
       label(for='killerCode') Your code:
       br
-      input#killerCode.form-control(type='text', placeholder='1701' name='killerCode' required='true' )
+      input#killerCode.form-control(type='text', placeholder='1701' name='killerCode' required='true' value=(undefined===playerCode ? '' : playerCode) )
      
     div.form-group
       label(for='victimUuid') Victim:

@@ -85,7 +85,8 @@ exports.attemptKillForm = function(req, res) {
         else {
             res.render('attemptKillForm', {
                 player: player,
-                victims: victims
+                victims: victims,
+                playerCode: req.query.playerCode
             })
         }
     })

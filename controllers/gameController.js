@@ -429,7 +429,7 @@ exports.gameJoinPost = [
 				            })
 				            .then(result => {
 					    		// Create email message
-					    		var attemptURL = baseURL + '/attempts?gameUuid=' + game.uuid + '&playerUuid=' + uuid
+					    		var attemptURL = baseURL + '/attempts?gameUuid=' + game.uuid + '&playerUuid=' + uuid + '&playerCode=' + playerCode
 					    		var message = 'Hey,\n\nYou\'ve successfully joined party "' + game.name + '".\
 					    		\n\nTo attempt a kill you need to use the following link:\
 					    		\n' + attemptURL + '\

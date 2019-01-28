@@ -28,10 +28,7 @@ block content
   ul
   each player in players
     li
-      if game.status==='ACTIVE'
-        a(href='/attempts?gameUuid='+game.uuid+'&playerUuid='+player.uuid ) #{player.firstName} #{player.lastName}
-      else
-        p #{player.firstName} #{player.lastName}
+      p #{player.firstName} #{player.lastName}
   else
     p There are no players.
 
