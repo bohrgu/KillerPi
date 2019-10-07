@@ -1,4 +1,5 @@
-var nodemailer = require('nodemailer');
+var nodemailer = require('nodemailer')
+const emailPassword = process.env.NODE_KILLER_EMAIL_PASSWORD
 
 exports.sendMail = function(destMail, subject, message) {
   var mail = {
@@ -12,7 +13,7 @@ exports.sendMail = function(destMail, subject, message) {
     service: 'gmail',
     auth: {
       user: 'killerpi.noreply@gmail.com',
-      pass: 'Killerpi89'
+      pass: emailPassword
     }
   })
 

@@ -2,7 +2,7 @@ const uuidv4 = require('uuid/v4')
 var models = require('../models')
 var mailer = require('../utils/mailer')
 var Promise = require('bluebird')
-const baseURL = process.env.NODE_BASE_URL
+const baseURL = process.env.NODE_KILLER_BASE_URL
 const myLog = require('../utils/myLog')
 
 exports.generateContracts = function(gameUuid) {

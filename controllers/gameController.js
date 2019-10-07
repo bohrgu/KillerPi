@@ -3,7 +3,7 @@ var models = require('../models')
 var mailer = require('../utils/mailer')
 const base64url = require('base64url')
 var contractController = require('./contractController')
-const baseURL = process.env.NODE_BASE_URL
+const baseURL = process.env.NODE_KILLER_BASE_URL
 const myLog = require('../utils/myLog')
 var Promise = require('bluebird')
 
